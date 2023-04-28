@@ -41,6 +41,9 @@ pub enum Error {
     ServerCreation(ServerError),
 }
 
+impl Display for Error { 
+}
+
 type Result<T> = std::result::Result<T, Error>;
 
 /// Structure associated with the API server implementation.
@@ -185,7 +188,7 @@ impl ApiServer {
                 Ok(vec) => vec,
                 Err(err) => {
                     // print request error, but keep server running
-                    error!("API Server error on retrieving incoming request: {}", err);
+                    error!("API Server error on retrieving incoming request: {}", err.kind().to_string());
                     continue;
                 }
             };
@@ -200,7 +203,7 @@ impl ApiServer {
                         }),
                     )
                     .or_else(|err| {
-                        error!("API Server encountered an error on response: {}", err);
+                        error!("API Server encountered an error on response: {}", err.kind().to_string());
                         Ok(())
                     })?;
 
@@ -243,7 +246,7 @@ impl ApiServer {
                 response
             }
             Err(err) => {
-                error!("{}", err);
+                error!("{}", err.kind().to_string());
                 err.into()
             }
         }

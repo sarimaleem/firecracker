@@ -118,6 +118,27 @@ pub enum FcExitCode {
     ArgParsing = 153,
 }
 
+impl fmt::Display for FcExitCode {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::result {
+        match(self) {
+            FcExitCode::Ok => write!(f, "Success"),
+            FcExitCode::GenericError => write!(f, "Generic Error"),
+            FcExitCode::UnexpectedError => write!(f, "Firecracker shutdown after intercepting a restricted system call"),
+            FcExitCode::BadSyscall => write!(f, "Firecracker shutdown after intercepting SIGBUS"),
+            FcExitCode::SIGSEGV => write!(f, "Firecracker shutdown after intercepting SIGSEGV"),
+            FcExitCode::SIGXFSZ => write!(f, "Firecracker shutdown after intercepting SIGXFSZ"),
+            FcExitCode::SIGXCPU => write!(f, "Firecracker shutdown after intercepting SIGXCPU"),
+            FcExitCode::SIGPIPE => write!(f, "Firecracker shutdown after intercepting SIGPIPE"),
+            FcExitCode::SIGHUP => write!(f, "Firecracker shutdown after intercepting SIGHUP"),
+            FcExitCode::SIGILL => write!(f, "Firecracker shutdown after intercepting SIGILL"),
+            FcExitCode::BadConfiguration => write!(f, "Fircracker received bad configuration of resources"),
+            FcExitCode::ArgParsing => write!(f, "Error in command line argument parsing"),
+             _ => write!(f, "Firecracker received unrecognized error code"),
+        }
+    }
+}
+
+
 /// Timeout used in recv_timeout, when waiting for a vcpu response on
 /// Pause/Resume/Save/Restore. A high enough limit that should not be reached during normal usage,
 /// used to detect a potential vcpu deadlock.
@@ -788,6 +809,9 @@ impl Vmm {
         // Once `vmm.shutdown_exit_code` becomes `Some(exit_code)`, it is the upper layer's
         // responsibility to break main event loop and propagate the exit code value.
         info!("Vmm is stopping.");
+        
+        // Display the exit code information for helpfulness
+        info!(exit_code);
 
         // We send a "Finish" event.  If a VCPU has already exited, this is the only
         // message it will accept... but running and paused will take it as well.
