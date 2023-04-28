@@ -160,14 +160,17 @@ pub(crate) fn run_with_api(
                     if inner.kind() == std::io::ErrorKind::AddrInUse =>
                 {
                     let sock_path = api_bind_path.display().to_string();
+                    let err_string = inner.kind().to_string();
                     error!(
                         "Failed to open the API socket at: {sock_path}. Check that it is not \
-                         already used."
+                         already used. Error encountered {err_string}"
                     );
+                    
                     std::process::exit(vmm::FcExitCode::GenericError as i32);
                 }
                 Err(api_server::Error::ServerCreation(err)) => {
-                    error!("Failed to bind and run the HTTP server: {err}");
+                    let err_string = inner.kind().to_string();
+                    error!("Failed to bind and run the HTTP server: {err_string}");
                     std::process::exit(vmm::FcExitCode::GenericError as i32);
                 }
             }
